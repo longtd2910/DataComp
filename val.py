@@ -15,6 +15,7 @@ from utils.metrics import ap_per_class, ConfusionMatrix
 from utils.torch_utils import select_device, time_sync
 from utils.general import check_dataset, check_img_size, check_suffix, check_yaml, box_iou,\
     non_max_suppression, scale_coords, xyxy2xywh, xywh2xyxy, set_logging, increment_path, colorstr
+from utils.loss import ComputeLoss
 
 
 FILE = Path(__file__).resolve()
@@ -108,6 +109,7 @@ def run(data,
 
         # Data
         data = check_dataset(data)
+        print(data)
 
     # Half
     half &= device.type != 'cpu'  # half precision only supported on CUDA
@@ -138,7 +140,7 @@ def run(data,
 
     loss = torch.zeros(3, device=device)
     stats, ap, ap_class = [], [], []
-
+    
     for batch_i, (img, targets, paths, shapes) in enumerate(tqdm(dataloader, desc=s)):
         t1 = time_sync()
 
@@ -160,10 +162,14 @@ def run(data,
         dt[1] += time_sync() - t2
 
         # Compute loss
+        compute_loss = ComputeLoss(model)
         if compute_loss:
             # box, obj, cls
-            loss += compute_loss([x.float() for x in train_out], targets)[1]
-
+            total, cp_loss = compute_loss([x.float() for x in train_out], targets)
+            loss += cp_loss[1]
+            cp_loss = cp_loss.cpu().detach().numpy()
+            with open('val_loss.txt', 'a') as loss_file:
+                loss_file.write(str(cp_loss[0]) + ' ' + str(cp_loss[1]) + ' '+ str(cp_loss[2])  +'\n')
         # Run NMS
         targets[:, 2:] *= torch.Tensor([width, height, width, height]).to(device)  # to pixels
         lb = [targets[targets[:, 0] == i, 1:] for i in range(batch_size)] if save_hybrid else []
@@ -215,7 +221,6 @@ def run(data,
             Thread(target=plot_images, args=(img, targets, paths, f, names), daemon=True).start()
             f = save_dir / f'val_batch{batch_i}_pred.jpg'  # predictions
             Thread(target=plot_images, args=(img, output_to_target(out), paths, f, names), daemon=True).start()
-
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]
 
@@ -261,6 +266,7 @@ def run(data,
     for i, c in enumerate(ap_class):
         maps[c] = ap[i]
     return (mp, mr, wap50, map50, map, *(loss.cpu() / len(dataloader)).tolist()), maps, t
+    
 
 
 def parser():
@@ -297,7 +303,7 @@ def main(args):
     print(colorstr('val: ') + ', '.join(f'{k}={v}' for k, v in vars(args).items()))
 
     if args.task in ('train', 'val', 'test'):  # run normally
-        run(**vars(args))
+        run(**vars(args), compute_loss=True)
 
 
 if __name__ == "__main__":
