@@ -92,7 +92,7 @@ def run(data,
     is_loaded_model = model is not None
     grid_size = None
     folder = task if task != 'test' else 'public_test'
-    Path("ExportData/{}".format(task)).mkdir(parents=True, exist_ok=True)
+    Path("ExportData/{}".format(folder)).mkdir(parents=True, exist_ok=True)
 
     if is_loaded_model:
         device = next(model.parameters()).device
