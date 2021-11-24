@@ -403,10 +403,11 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 for img_name in self.img_files:
                     order.write('{}\n'.format(img_name))
 
-            
+            Path("ExportData/{}/expect".format(spl)).mkdir(parents=True, exist_ok=True)
             for img_name in self.img_files:
                 #Copy images to ExportData
                 shutil.copy(img_name, 'ExportData/{}/'.format(spl))
+
                 #Copy matching label from dataset
                 shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), 'ExportData/{}/expect/'.format(spl))
 
