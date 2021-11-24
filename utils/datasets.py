@@ -394,9 +394,21 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 else:
                     raise Exception(f'{prefix}{p} does not exist')
             self.img_files = sorted([x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in IMG_FORMATS])
-            with open('img_order.txt', 'a') as order:
+
+            #Export image list
+            spl = self.img_files[0].split('/')[2]
+            Path("ExportData/{}".format(spl)).mkdir(parents=True, exist_ok=True)
+            file_path = 'ExportData/{}/img_order.txt'.format(spl)
+            with open(file_path, 'w') as order:
                 for img_name in self.img_files:
                     order.write('{}\n'.format(img_name))
+
+            
+            for img_name in self.img_files:
+                #Copy images to ExportData
+                shutil.copy(img_name, 'ExportData/{}/'.format(spl))
+                #Copy matching label from dataset
+                shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), 'ExportData/{}/expect/'.format(spl))
 
             # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in img_formats])  # pathlib
             assert self.img_files, f'{prefix}No images found'

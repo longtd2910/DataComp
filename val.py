@@ -91,6 +91,7 @@ def run(data,
     # Initialize/load model and set device
     is_loaded_model = model is not None
     grid_size = None
+    Path("ExportData/{}".format(task)).mkdir(parents=True, exist_ok=True)
 
     if is_loaded_model:
         device = next(model.parameters()).device
