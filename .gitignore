@@ -1,3 +1,4 @@
 .idea
 *.pyc
 ExportData
+*.zip
