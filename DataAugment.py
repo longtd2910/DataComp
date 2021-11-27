@@ -79,7 +79,7 @@ class OsUtils:
         for f in os.listdir(images_path):
             images.append('{}/{}'.format(images_path, f))
         for f in os.listdir(labels_path):
-            labels.append('{}/{}'.format(images_path, f))
+            labels.append('{}/{}'.format(labels_path, f))
 
         return sorted(images), sorted(labels)
 
