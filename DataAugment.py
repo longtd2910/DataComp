@@ -61,7 +61,7 @@ class OsUtils:
         output = './dataset.zip'
         gdown.download(url, output, quiet=False)
 
-    def match_img_label(path: str, split: str) -> list[list[str]]:
+    def match_img_label(path: str, split: str) -> Tuple:
         '''
         path(str) is path to DATASET with structure:
         DATASET -> split -> images -> labels
@@ -81,7 +81,7 @@ class OsUtils:
         for f in os.listdir(labels_path):
             labels.append('{}/{}'.format(images_path, f))
 
-        return tuple(zip(sorted(images), sorted(labels)))
+        return sorted(images), sorted(labels)
 
     def prepare_dir(path: str, split: str) -> None:
         root = '{}/Augmented/{}'.format(path, split)
@@ -90,7 +90,7 @@ class OsUtils:
 
 
 class DatasetUtils:
-    def label_read(path: str) -> Tuple[list[str], list[list[float]]]:
+    def label_read(path: str) -> Tuple:
         labels = []
         bboxes = []
         with open(path, 'r') as f:
@@ -102,7 +102,7 @@ class DatasetUtils:
 
 
 class AugmentWorker:
-    def __call__(self, path: str, split: str, image: np.array, bboxes: list[list[float]], labels: list[int], index: int, transformer: Augmenter.Compose, vers: int) -> None:
+    def __call__(self, path: str, split: str, image: np.array, bboxes: list, labels: list, index: int, transformer: Augmenter.Compose, vers: int) -> None:
         for i in range(vers):
             transformed = transformer(image=image, bboxes=bboxes, category_ids=labels)
             data = transformed['image']
