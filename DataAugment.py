@@ -143,5 +143,3 @@ class AugmentWorker:
                 f.write("%s %s %s %s %s\r\n" % (transformed['category_ids'][i], transformed['bboxes'][i][0],
                         transformed['bboxes'][i][1], transformed['bboxes'][i][2], transformed['bboxes'][i][3]))
             f.close()
-
-print(DatasetUtils.report_dataset('./dataset'))
