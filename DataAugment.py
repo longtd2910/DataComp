@@ -7,7 +7,7 @@ import gdown
 import os
 import numpy as np
 from PIL import Image
-
+from shutil import copy
 
 # Pipeline for automated image augmentation
 # Object Logic Workflow:
@@ -84,9 +84,8 @@ class OsUtils:
         return sorted(images), sorted(labels)
 
     def prepare_dir(path: str, split: str) -> None:
-        root = '{}/Augmented/{}'.format(path, split)
-        os.makedirs(root + '/images/', exist_ok=True)
-        os.makedirs(root + '/labels/', exist_ok=True)
+        os.makedirs('{}/Augmented/images/{}'.format(path, split), exist_ok=True)
+        os.makedirs('{}/Augmented/images/{}'.format(path, split) + '/labels/', exist_ok=True)
 
 
 class DatasetUtils:
@@ -100,6 +99,33 @@ class DatasetUtils:
                 bboxes.append([float(i) for i in data[1:]])
         return labels, bboxes
 
+    def report_dataset(path: str) -> str:
+        # path = path to a folder containing /images/ and /labels/
+        # train, val, public_test
+        # no_mask, mask, incorrect_mask
+        split = ['train', 'val', 'public_test']
+        label = ['no_mask', 'mask', 'incorrect_mask']
+        result = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        for i in range(len(split)):
+            for f in os.listdir('{}/labels/{}'.format(path, split[i])):
+                with open('{}/labels/{}/{}'.format(path, split[i], f), 'r') as label_file:
+                    for line in label_file.readlines():
+                        try:
+                            result[i][int(line[0])] += 1
+                        except:
+                            pass
+        result_str = 'Dataset include:\n'
+        for i in range(len(split)):
+            result_str += split[i] + ': '
+            ratio = []
+            for j in range(len(result[i])):
+                result_str += str(result[i][j]) + ' ' + label[j]
+                if j != len(result[i]) - 1:
+                    result_str += ', '
+                ratio.append(round(result[i][j] / sum(result[i]) * 100, 2))
+            result_str += '\n(Ratio): {}% no_mask | {}% mask | {}% incorrect_mask\n'.format(ratio[0], ratio[1], ratio[2])
+        return result_str
+
 
 class AugmentWorker:
     def __call__(self, path: str, split: str, image: np.array, bboxes: list, labels: list, index: int, transformer: Augmenter.Compose, vers: int) -> None:
@@ -108,12 +134,14 @@ class AugmentWorker:
             data = transformed['image']
             # Save image
             img = Image.fromarray(data, 'RGB')
-            img_path = '{}/Augmented/{}/images/img_{}_ver_{}.jpg'.format(path, split, index, i)
+            img_path = '{}/Augmented/images/{}/img_{}_ver_{}.jpg'.format(path, split, index, i)
             img.save(img_path)
             # Save label
-            label_path = '{}/Augmented/{}/labels/img_{}_ver_{}.txt'.format(path, split, index, i)
+            label_path = '{}/Augmented/labels/{}/img_{}_ver_{}.txt'.format(path, split, index, i)
             f = open(label_path, "w+")
             for i in range(len(transformed['bboxes'])):
                 f.write("%s %s %s %s %s\r\n" % (transformed['category_ids'][i], transformed['bboxes'][i][0],
                         transformed['bboxes'][i][1], transformed['bboxes'][i][2], transformed['bboxes'][i][3]))
             f.close()
+
+print(DatasetUtils.report_dataset('./dataset'))
