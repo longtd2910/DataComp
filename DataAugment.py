@@ -106,6 +106,7 @@ class DatasetUtils:
         split = ['train', 'val', 'public_test']
         label = ['no_mask', 'mask', 'incorrect_mask']
         result = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        file = 0
         for i in range(len(split)):
             for f in os.listdir('{}/labels/{}'.format(path, split[i])):
                 with open('{}/labels/{}/{}'.format(path, split[i], f), 'r') as label_file:
@@ -114,6 +115,7 @@ class DatasetUtils:
                             result[i][int(line[0])] += 1
                         except:
                             pass
+                file += 1
         result_str = 'Dataset include:\n'
         for i in range(len(split)):
             result_str += split[i] + ': '
@@ -124,7 +126,7 @@ class DatasetUtils:
                     result_str += ', '
                 ratio.append(round(result[i][j] / sum(result[i]) * 100, 2))
             result_str += '\n(Ratio): {}% no_mask | {}% mask | {}% incorrect_mask\n'.format(ratio[0], ratio[1], ratio[2])
-        return result_str
+        return result_str + '\nTotal {} images'.format(file-1)
 
 
 class AugmentWorker:
