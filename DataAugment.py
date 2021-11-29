@@ -115,7 +115,8 @@ class DatasetUtils:
                             result[i][int(line[0])] += 1
                         except:
                             pass
-                file += 1
+                if(split[i] == 'train'):
+                    file += 1
         result_str = 'Dataset include:\n'
         for i in range(len(split)):
             result_str += split[i] + ': '
