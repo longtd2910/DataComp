@@ -85,7 +85,7 @@ class OsUtils:
 
     def prepare_dir(path: str, split: str) -> None:
         os.makedirs('{}/Augmented/images/{}'.format(path, split), exist_ok=True)
-        os.makedirs('{}/Augmented/images/{}'.format(path, split) + '/labels/', exist_ok=True)
+        os.makedirs('{}/Augmented/labels/{}'.format(path, split), exist_ok=True)
 
 
 class DatasetUtils:
