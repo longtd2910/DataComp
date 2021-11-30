@@ -40,7 +40,7 @@ class ExcelWorker:
             self.worksheet.write(row, col, value)
         return value
 
-    def add_row(self, row: int, image: str, correct: list[int], pred: list[int], acc: list[int], loss: list[float], iou: list[str], split: str):
+    def add_row(self, row: int, image: str, correct: list, pred: list, acc: list, loss: list, iou: list, split: str):
         # Get the image size
         w_pixel, h_pixel = Image.open(image).size
 
@@ -83,7 +83,7 @@ class Util:
         lst.pop(lst.index(min(lst)))
         return min(lst)
 
-    def calc_iou(expect: list[float], pred: list[float]):
+    def calc_iou(expect: list, pred: list):
         # Define points of bounding box expect(ABCD), pred(MNPQ)
         xC = expect[0] - expect[2] / 2
         yC = expect[1] - expect[3] / 2
@@ -170,7 +170,7 @@ class DataExport:
     def get_split_path(self, split: str) -> str:
         return '{}/{}'.format(self.path, split)
 
-    def get_images_name(self, split: str) -> list[str]:
+    def get_images_name(self, split: str) -> list:
         images = []
         try:
             with open(self.get_split_path(split) + '/img_order.txt') as img_order:
@@ -182,7 +182,7 @@ class DataExport:
         except:
             print('img_order.txt not exist in ' + self.get_split_path(split))
 
-    def get_val_loss(self, split: str) -> list[list[float]]:
+    def get_val_loss(self, split: str) -> list:
         val_loss = []
         try:
             with open(self.get_split_path(split) + '/val_loss.txt') as val_loss_file:
@@ -192,7 +192,7 @@ class DataExport:
         except:
             print('val_loss.txt not exist in ' + self.get_split_path(split))
 
-    def get_prediction(self, split: str, image: str) -> Tuple[list[str], list[list[float]]]:
+    def get_prediction(self, split: str, image: str) -> Tuple:
         prediction_label = []
         prediction_bbox = []
         with open(self.get_split_path(split) + '/predict/' + image + '.txt') as prediction:
@@ -202,7 +202,7 @@ class DataExport:
                 prediction_bbox.append(list(map(float, data.split())))
         return prediction_label, prediction_bbox
 
-    def get_expectation(self, split: str, image: str) -> Tuple[list[str], list[list[float]]]:
+    def get_expectation(self, split: str, image: str) -> Tuple:
         expect_label = []
         expect_bbox = []
         with open(self.get_split_path(split) + '/expect/' + image + '.txt') as prediction:
@@ -212,10 +212,10 @@ class DataExport:
                 expect_bbox.append(list(map(float, data.split())))
         return expect_label, expect_bbox
 
-    def get_accuracy(self, expect: list[str], pred: list[str]) -> list[int]:
+    def get_accuracy(self, expect: list, pred: list) -> list:
         return [int(ex == pd) for ex, pd in zip(expect, pred)]
 
-    def get_iou(self, expect: list[list[float]], pred: list[list[float]]) -> list[float]:
+    def get_iou(self, expect: list, pred: list) -> list:
         return [round(Util.calc_iou(ex, pr), 4) for ex, pr in zip(expect, pred)]
 
     def __call__(self) -> None:
@@ -286,5 +286,5 @@ class TestExportData(unittest.TestCase):
 
 if __name__ == '__main__':
     #unittest.main(verbosity=2)
-    exporter = DataExport('ExportData')
+    exporter = DataExport('content/DataComp/ExportData')
     exporter()

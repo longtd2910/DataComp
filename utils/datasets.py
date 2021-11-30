@@ -397,19 +397,19 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
             #Export image list
             spl = self.img_files[0].split('/')[2]
-            Path("ExportData/{}".format(spl)).mkdir(parents=True, exist_ok=True)
-            file_path = 'ExportData/{}/img_order.txt'.format(spl)
+            Path("content/DataComp/ExportData/{}".format(spl)).mkdir(parents=True, exist_ok=True)
+            file_path = 'content/DataComp/ExportData/{}/img_order.txt'.format(spl)
             with open(file_path, 'w') as order:
                 for img_name in self.img_files:
                     order.write('{}\n'.format(img_name))
 
-            Path("ExportData/{}/expect".format(spl)).mkdir(parents=True, exist_ok=True)
+            Path("content/DataComp/ExportData/{}/expect".format(spl)).mkdir(parents=True, exist_ok=True)
             for img_name in self.img_files:
                 #Copy images to ExportData
-                shutil.copy(img_name, 'ExportData/{}/'.format(spl))
+                shutil.copy(img_name, 'content/DataComp/ExportData/{}/'.format(spl))
 
                 #Copy matching label from dataset
-                shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), 'ExportData/{}/expect/'.format(spl))
+                shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), 'content/DataComp/ExportData/{}/expect/'.format(spl))
 
             # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in img_formats])  # pathlib
             assert self.img_files, f'{prefix}No images found'
