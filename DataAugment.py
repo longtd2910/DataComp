@@ -79,7 +79,8 @@ class OsUtils:
         for f in os.listdir(images_path):
             images.append('{}/{}'.format(images_path, f))
         for f in os.listdir(labels_path):
-            labels.append('{}/{}'.format(labels_path, f))
+            if f != 'classes.txt':
+                labels.append('{}/{}'.format(labels_path, f))
 
         return sorted(images), sorted(labels)
 
