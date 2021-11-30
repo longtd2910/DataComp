@@ -143,18 +143,6 @@ class DataExport:
 
     # Folder structure
     # \__Targeting
-    #  \__train
-    #     \__expect
-    #     \__predict
-    #     \__images
-    #     \__img_order.txt
-    #     \__val_loss.txt
-    #  \__val
-    #     \__expect
-    #     \__predict
-    #     \__images
-    #     \__img_order.txt
-    #     \__val_loss.txt
     #  \__public_test
     #     \__expect
     #     \__predict
@@ -162,10 +150,10 @@ class DataExport:
     #     \__img_order.txt
     #     \__val_loss.txt
 
-    SPLIT_PATCH = ['public_test', 'val', 'train']
     LABEL = ['no_mask', 'mask', 'incorrect_mask']
     def __init__(self, path: str) -> None:
         self.path = path
+        self.image_path = '{}/public_test/images'
 
     def get_split_path(self, split: str) -> str:
         return '{}/{}'.format(self.path, split)

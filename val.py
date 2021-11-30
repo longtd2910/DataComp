@@ -73,9 +73,9 @@ def run(data,
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
         augment=False,  # augmented inference
         verbose=False,  # verbose output
-        save_txt=False,  # save results to *.txt
-        save_hybrid=False,  # save label+prediction hybrid results to *.txt
-        save_conf=False,  # save confidences in --save-txt labels
+        save_txt=True,  # save results to *.txt
+        save_hybrid=True,  # save label+prediction hybrid results to *.txt
+        save_conf=True,  # save confidences in --save-txt labels
         project='results/val',  # save to project/name
         name='exp',  # save to project/name
         exist_ok=False,  # existing project/name ok, do not increment
