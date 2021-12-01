@@ -395,24 +395,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                     raise Exception(f'{prefix}{p} does not exist')
             self.img_files = sorted([x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in IMG_FORMATS])
 
-            #Export image list
-            spl = self.img_files[0].split('/')[2]
-            Path("/content/DataComp/ExportData/{}".format(spl)).mkdir(parents=True, exist_ok=True)
-            file_path = '/content/DataComp/ExportData/{}/img_order.txt'.format(spl)
-            print(file_path)
-            with open(file_path, 'w') as order:
-                for img_name in self.img_files:
-                    order.write('{}\n'.format(img_name))
-            order.close()
-
-            Path("/content/DataComp/ExportData/{}/expect".format(spl)).mkdir(parents=True, exist_ok=True)
-            for img_name in self.img_files:
-                #Copy images to ExportData
-                shutil.copy(img_name, '/content/DataComp/ExportData/{}/'.format(spl))
-
-                #Copy matching label from dataset
-                shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), '/content/DataComp/ExportData/{}/expect/'.format(spl))
-
             # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in img_formats])  # pathlib
             assert self.img_files, f'{prefix}No images found'
         except Exception as e:
@@ -477,7 +459,23 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                     shapes[i] = [1, 1 / mini]
 
             self.batch_shapes = np.ceil(np.array(shapes) * img_size / stride + pad).astype(np.int) * stride
+        # Export image list
+            spl = self.img_files[0].split('/')[2]
+            Path("/content/DataComp/ExportData/{}".format(spl)).mkdir(parents=True, exist_ok=True)
+            file_path = '/content/DataComp/ExportData/{}/img_order.txt'.format(spl)
+            print(file_path)
+            with open(file_path, 'w') as order:
+                for img_name in self.img_files:
+                    order.write('{}\n'.format(img_name))
+            order.close()
 
+            Path("/content/DataComp/ExportData/{}/expect".format(spl)).mkdir(parents=True, exist_ok=True)
+            for img_name in self.img_files:
+                # Copy images to ExportData
+                shutil.copy(img_name, '/content/DataComp/ExportData/{}/'.format(spl))
+
+                # Copy matching label from dataset
+                shutil.copy('{}.txt'.format(img_name[:-4]).replace('images', 'labels'), '/content/DataComp/ExportData/{}/expect/'.format(spl))
         # Cache images into memory for faster training (WARNING: large datasets may exceed system RAM)
         self.imgs, self.img_npy = [None] * n, [None] * n
         if cache_images:
