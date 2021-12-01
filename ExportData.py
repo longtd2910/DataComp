@@ -195,11 +195,14 @@ class DataExport:
     def get_prediction(self, split: str, image: str) -> Tuple:
         prediction_label = []
         prediction_bbox = []
-        with open(self.get_split_path(split) + '/predict/' + image + '.txt') as prediction:
-            for line in prediction.readlines():
-                data = line[1:]
-                prediction_label.append(self.LABEL[int(line[0])])
-                prediction_bbox.append(list(map(float, data.split())))
+        try:
+            with open(self.get_split_path(split) + '/predict/' + image + '.txt') as prediction:
+                for line in prediction.readlines():
+                    data = line[1:]
+                    prediction_label.append(self.LABEL[int(line[0])])
+                    prediction_bbox.append(list(map(float, data.split())))
+        except:
+            return [], []
         return prediction_label, prediction_bbox
 
     def get_expectation(self, split: str, image: str) -> Tuple:
@@ -286,5 +289,5 @@ class TestExportData(unittest.TestCase):
 
 if __name__ == '__main__':
     #unittest.main(verbosity=2)
-    exporter = DataExport('content/DataComp/ExportData')
+    exporter = DataExport('/content/DataComp/ExportData')
     exporter()
